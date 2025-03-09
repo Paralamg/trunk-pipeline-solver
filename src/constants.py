@@ -6,6 +6,8 @@ class Constants:
     temperature_st: float = 293.15
     gravity: float = 9.81
     pressure_min: float = 0.2e6
+    heat_transfer: float = 1.3
+    heat_capacity: float = 2e3
 
 
 @lru_cache()

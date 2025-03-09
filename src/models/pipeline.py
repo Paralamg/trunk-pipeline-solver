@@ -5,8 +5,13 @@ from ..constants import get_constant
 constant = get_constant()
 
 
-def get_pressure(head: float, density: float, elevation: float = 0) -> float:
-    pressure = (head - elevation) / (constant.gravity * density)
+def get_pressure(head: float, density: float) -> float:
+    pressure = head / (constant.gravity * density)
+    return pressure
+
+
+def get_head(pressure: float, density: float) -> float:
+    head = pressure * constant.gravity * density
     return pressure
 
 
@@ -40,13 +45,23 @@ class Pipe:
         calc_lambda = self.__get_lambda(flow_rate)
         head_loss = (1.02 * calc_lambda * self.length * 8 * flow_rate ** 2 /
                      (self.inner_diameter ** 5 * math.pi ** 2 * 9.81))
-        inlet_head = outlet_head + head_loss
-        self.inlet_pressure = get_pressure(inlet_head, self.density, self.inlet_elevation)
-        if
-        return inlet_head
+        self.inlet_head = outlet_head + head_loss
+        self.inlet_pressure = get_pressure(self.inlet_head - self.inlet_elevation, self.density)
 
-    def solve_outlet_temperature(self, flow_rate: float, outlet_head: float) -> float:
-        pass
+        if self.inlet_pressure < constant.pressure_min:
+            self.inlet_head = get_head(constant.pressure_min, self.density) + self.inlet_elevation
+
+        return self.inlet_head
+
+    def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
+        self.inlet_temperature = inlet_temperature
+        a = (math.pi * constant.heat_transfer * self.inner_diameter /
+             (self.density * flow_rate * constant.heat_capacity))
+
+        i = (self.inlet_head - self.outlet_head) / self.length
+        self.outlet_temperature = (self.inlet_temperature
+                                   - (a * (self.inlet_temperature - self.temperature_env)
+                                      - constant.gravity * i / constant.heat_capacity) * self.length)
 
     def __get_lambda(self, flow_rate) -> float:
         re = 4 * flow_rate / (self.viscosity * math.pi * self.inner_diameter)
