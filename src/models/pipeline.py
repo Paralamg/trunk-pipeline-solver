@@ -1,6 +1,7 @@
 import math
-from typing import List
+from typing import List, override
 from ..constants import get_constant
+from .model_base import ModelBase
 
 constant = get_constant()
 
@@ -15,7 +16,7 @@ def get_head(pressure: float, density: float) -> float:
     return pressure
 
 
-class Pipe:
+class Pipe(ModelBase):
     def __init__(self, **kwargs):
         self.outer_diameter = kwargs["outer_diameter"]
         self.inner_diameter = kwargs["inner_diameter"]
@@ -40,6 +41,7 @@ class Pipe:
         self.pressure_mean = constant.pressure_st
         self.temperature_mean = constant.temperature_st
 
+    @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
         self.outlet_head = outlet_head
         calc_lambda = self.__get_lambda(flow_rate)
@@ -53,6 +55,7 @@ class Pipe:
 
         return self.inlet_head
 
+    @override
     def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
         self.inlet_temperature = inlet_temperature
         a = (math.pi * constant.heat_transfer * self.inner_diameter /
