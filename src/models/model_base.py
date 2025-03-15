@@ -1,7 +1,7 @@
 import abc
 
 
-class ModelBase(abc.ABC):
+class HydraulicModelBase(abc.ABC):
     @abc.abstractmethod
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
         """

@@ -1,7 +1,7 @@
 import math
 from typing import List, override
 
-from .model_base import ModelBase
+from .model_base import HydraulicModelBase
 from ..constants import get_constant
 from ..schemas import PipeSchema
 
@@ -9,22 +9,23 @@ constant = get_constant()
 
 
 def get_pressure(head: float, density: float) -> float:
-    pressure = head / (constant.gravity * density)
+
+    pressure = head * constant.gravity * density
+
     return pressure
 
 
 def get_head(pressure: float, density: float) -> float:
-    head = pressure * constant.gravity * density
-    return pressure
+    head = pressure / (constant.gravity * density)
+    return head
 
 
-class Pipe(ModelBase):
+class Pipe(HydraulicModelBase):
     def __init__(self, data: PipeSchema):
         self.outer_diameter = data.outer_diameter
         self.inner_diameter = data.inner_diameter
         self.length = data.length
         self.roughness = data.roughness
-        self.viscosity = data.viscosity
         self.density = data.density
         self.temperature_env = data.temperature_env
 
@@ -32,11 +33,11 @@ class Pipe(ModelBase):
 
         self.inlet_head: float | None = None
         self.inlet_temperature: float | None = None
-        self.inlet_elevation: float | None = None
+        self.inlet_elevation = data.inlet_elevation
 
         self.outlet_head: float | None = None
         self.outlet_temperature: float | None = None
-        self.outlet_elevation: float | None = None
+        self.outlet_elevation = data.outlet_elevation
 
         self._temperature_mean = constant.temperature_st
 
@@ -88,8 +89,8 @@ class Pipe(ModelBase):
     def __get_lambda(self, flow_rate) -> float:
         re = 4 * flow_rate / (self.viscosity * math.pi * self.inner_diameter)
         epsilon = self.inner_diameter / self.roughness
-        d1 = 10 / epsilon
-        d2 = 500 / epsilon
+        d1 = 10 * epsilon
+        d2 = 500 * epsilon
 
         if re < d1:
             return 0.3164 / re ** 0.25

@@ -6,7 +6,9 @@ class PipeSchema(BaseModel):
     inner_diameter: PositiveFloat
     length: PositiveFloat
     roughness: PositiveFloat
-    viscosity: PositiveFloat
     density: PositiveFloat
     temperature_env: PositiveFloat
+    inlet_elevation: float
+    outlet_elevation: float
+
 
