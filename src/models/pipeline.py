@@ -3,6 +3,7 @@ from typing import List, override
 
 from .model_base import ModelBase
 from ..constants import get_constant
+from ..schemas import PipeSchema
 
 constant = get_constant()
 
@@ -18,16 +19,14 @@ def get_head(pressure: float, density: float) -> float:
 
 
 class Pipe(ModelBase):
-    def __init__(self, **kwargs):
-        self.outer_diameter = kwargs["outer_diameter"]
-        self.inner_diameter = kwargs["inner_diameter"]
-        self.length = kwargs["length"]
-        self.roughness = kwargs["roughness"]
-        self.viscosity = kwargs["viscosity"]
-        self.density = kwargs["density"]
-        self.temperature_env = kwargs["temperature_env"]
-        self.temperature_crit = kwargs["temperature_crit"]
-        self.pressure_crit = kwargs["pressure_crit"]
+    def __init__(self, data: PipeSchema):
+        self.outer_diameter = data.outer_diameter
+        self.inner_diameter = data.inner_diameter
+        self.length = data.length
+        self.roughness = data.roughness
+        self.viscosity = data.viscosity
+        self.density = data.density
+        self.temperature_env = data.temperature_env
 
         self.flow_rate: float | None = None
 
@@ -39,8 +38,7 @@ class Pipe(ModelBase):
         self.outlet_temperature: float | None = None
         self.outlet_elevation: float | None = None
 
-        self.pressure_mean = constant.pressure_st
-        self.temperature_mean = constant.temperature_st
+        self._temperature_mean = constant.temperature_st
 
     @property
     def inlet_pressure(self):
@@ -49,6 +47,10 @@ class Pipe(ModelBase):
     @property
     def outlet_pressure(self):
         return get_pressure(self.outlet_head - self.outlet_elevation, self.density)
+
+    @property
+    def temperature_mean(self):
+        return self._temperature_mean
 
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
@@ -103,4 +105,4 @@ class Pipe(ModelBase):
 
 class Pipeline:
     def __init__(self):
-        self.pipeline: List[Pipe] = []
+        self.pipeline: List[PipeSchema] = []
