@@ -9,9 +9,7 @@ constant = get_constant()
 
 
 def get_pressure(head: float, density: float) -> float:
-
     pressure = head * constant.gravity * density
-
     return pressure
 
 
@@ -39,8 +37,6 @@ class Pipe(HydraulicModelBase):
         self.outlet_temperature: float | None = None
         self.outlet_elevation = data.outlet_elevation
 
-        self._temperature_mean = constant.temperature_st
-
     @property
     def inlet_pressure(self):
         return get_pressure(self.inlet_head - self.inlet_elevation, self.density)
@@ -51,14 +47,13 @@ class Pipe(HydraulicModelBase):
 
     @property
     def temperature_mean(self):
-        return self._temperature_mean
+        return self.outlet_temperature if self.outlet_temperature else constant.temperature_st
 
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
         self.flow_rate = flow_rate
         self.outlet_head = outlet_head
 
-        self.viscosity = self.__get_visconsity(self.temperature_mean)
         calc_lambda = self.__get_lambda(self.flow_rate)
         head_loss = (1.02 * calc_lambda * self.length * 8 * self.flow_rate ** 2 /
                      (self.inner_diameter ** 5 * math.pi ** 2 * constant.gravity))
@@ -87,10 +82,11 @@ class Pipe(HydraulicModelBase):
         return self.outlet_temperature
 
     def __get_lambda(self, flow_rate) -> float:
-        re = 4 * flow_rate / (self.viscosity * math.pi * self.inner_diameter)
-        epsilon = self.inner_diameter / self.roughness
-        d1 = 10 * epsilon
-        d2 = 500 * epsilon
+        viscosity = self.__get_visconsity(self.temperature_mean)
+        re = 4 * flow_rate / (viscosity * math.pi * self.inner_diameter)
+        epsilon = self.roughness / self.inner_diameter
+        d1 = 10 / epsilon
+        d2 = 500 / epsilon
 
         if re < d1:
             return 0.3164 / re ** 0.25

@@ -20,7 +20,7 @@ def create_pipe():
     return pipe
 
 def test_pipe_solve_inlet_head(pipe: Pipe):
-    flow_rate = 0.8
+    flow_rate = 1.2
     outlet_head = 120
     inlet_head = pipe.solve_inlet_head(flow_rate, outlet_head)
     assert inlet_head > outlet_head + 10
@@ -31,4 +31,5 @@ def test_pipe_solve_outlet_temperature(pipe: Pipe):
     inlet_temperature = 330
     outlet_temperature = pipe.solve_outlet_temperature(flow_rate, inlet_temperature)
     assert outlet_temperature < inlet_temperature - 10
+    assert outlet_temperature > pipe.temperature_env
 
