@@ -1,21 +1,36 @@
 import numpy as np
 
-def interpolate_value(points, x):
-    """
-    Интерполирует значение в точке x по кусочно-линейной функции.
 
-    :param points: Отсортированный список кортежей (координата, значение).
-    :param x: Координата, для которой нужно найти значение.
-    :return: Интерполированное значение.
-    """
-    coords, values = zip(*points)  # Разбираем список на два массива
-    return np.interp(x, coords, values)  # Используем линейную интерполяцию
+class Interpolator:
 
-# Пример использования
-points = [(0, 100), (50, 300), (200, 150)]
-x = 75
-print(interpolate_value(points, x))
-print(interpolate_value(points, 0))
-print(interpolate_value(points, 10))
-print(interpolate_value(points, 50))
-print(interpolate_value(points, 100))
+    def __init__(self, coords: np.ndarray, values: np.ndarray):
+        if len(coords) != len(values):
+            raise ValueError('Coordinates must be the same length as values')
+
+        self.coords = coords
+        self.values = values
+
+    def __call__(self, value: float) -> float:
+        return self.__interpolate(value)
+
+    def __interpolate(self, value: float):
+        """
+        Интерполирует значение в точке x по кусочно-линейной функции.
+
+        :param value: Координата, для которой нужно найти значение.
+        :return: Интерполированное значение.
+        """
+        return np.interp(value, self.coords, self.values)  # Используем линейную интерполяцию
+
+
+if __name__ == '__main__':
+    # Пример использования
+    points = np.array([(0, 100), (50, 300), (200, 150)])
+    print(points[-1,0])
+    interpolator = Interpolator(points[:, 0], points[:, 1])
+    x = 75
+    print(interpolator(x))
+    print(interpolator(0))
+    print(interpolator(10))
+    print(interpolator(50))
+    print(interpolator(300))
