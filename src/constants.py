@@ -7,7 +7,6 @@ class Constants:
     temperature_st: float = 293.15
     gravity: float = 9.81
     saturated_vapour_pressure: float = 0.2e6
-    heat_transfer: float = 1.3
     heat_capacity: float = 2e3
     temperature_viscosity_base: float = 283.15
     viscosity_base: float = 45e-6

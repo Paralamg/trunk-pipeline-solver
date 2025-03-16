@@ -1,8 +1,6 @@
 import math
 from typing import List, override
 
-import numpy as np
-
 from .model_base import HydraulicModelBase
 from ..constants import get_constant
 from ..interpolate import Interpolator
@@ -40,12 +38,12 @@ class Pipe():
         self.roughness = data.roughness
         self.density = data.density
         self.temperature_env = data.temperature_env
+        self.heat_transfer = data.heat_transfer
 
         self.flow_rate: float | None = None
 
         self.inlet_node = inlet_node
         self.outlet_node = outlet_node
-
 
     @property
     def inlet_pressure(self):
@@ -63,7 +61,6 @@ class Pipe():
     def length(self):
         return abs(self.outlet_node.x - self.inlet_node.x)
 
-    @override
     def solve_inlet_head(self, flow_rate: float) -> float:
         self.flow_rate = flow_rate
 
@@ -79,9 +76,8 @@ class Pipe():
 
         return self.inlet_node.head
 
-    @override
     def solve_outlet_temperature(self, flow_rate: float) -> float:
-        a = (math.pi * constant.heat_transfer * self.inner_diameter /
+        a = (math.pi * self.heat_transfer * self.inner_diameter /
              (self.density * flow_rate * constant.heat_capacity))
 
         self.outlet_node.temperature = self.inlet_node.temperature - a * (
@@ -140,11 +136,16 @@ class Pipeline(HydraulicModelBase):
             pipe = Pipe(data, start_node, end_node)
             self.pipes.append(pipe)
 
-
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
-        pass
+        self.nodes[-1].head = outlet_head
+        for pipe in self.pipes[::-1]:
+            pipe.solve_inlet_head(flow_rate)
+        return self.nodes[0].head
 
     @override
     def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
-        pass
+        self.nodes[0].temperature = inlet_temperature
+        for pipe in self.pipes:
+            pipe.solve_outlet_temperature(flow_rate)
+        return self.nodes[-1].temperature

@@ -10,6 +10,7 @@ class PipeSchema(BaseModel):
     roughness: PositiveFloat
     density: PositiveFloat
     temperature_env: PositiveFloat
+    heat_transfer: PositiveFloat
 
 
 class PipelineSchema(PipeSchema):
