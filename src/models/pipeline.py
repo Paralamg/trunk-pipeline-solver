@@ -33,7 +33,7 @@ class Node():
         return self.interpolator(self.x)
 
 
-class Pipe(HydraulicModelBase):
+class Pipe():
     def __init__(self, data: PipeSchema, inlet_node: Node, outlet_node: Node):
         self.outer_diameter = data.outer_diameter
         self.inner_diameter = data.inner_diameter
@@ -61,7 +61,7 @@ class Pipe(HydraulicModelBase):
 
     @property
     def length(self):
-        return self.outlet_node.x - self.inlet_node.x
+        return abs(self.outlet_node.x - self.inlet_node.x)
 
     @override
     def solve_inlet_head(self, flow_rate: float) -> float:
@@ -114,19 +114,32 @@ class Pipe(HydraulicModelBase):
 
 
 class Pipeline(HydraulicModelBase):
-    def __init__(self, data: PipelineSchema):
-        self.pipeline: List[Pipe] = []
-        self.elevation_profile: np.ndarray = data.elevation_profile
+    def __init__(self, data: PipelineSchema, interpolator: Interpolator):
+        self.pipes: List[Pipe] = []
+        self.nodes: List[Node] = []
         self.segment_length: float = data.segment_length
+        self.start_coordinate = data.start_coordinate
+        self.end_coordinate = data.end_coordinate
+        self.interpolator = interpolator
 
         # Сортировка по координате value
-        sorted_indices = np.argsort(self.elevation_profile[:, 0])
-        self.elevation_profile = self.elevation_profile[sorted_indices]
+        self.length: float = abs(self.end_coordinate - self.start_coordinate)
+        pipes_number = math.ceil(self.length / self.segment_length)
 
-        self.length: float = self.elevation_profile[-1, 0] - self.elevation_profile[0, 0]
-        pipe_schema = PipeSchema(
+        next_coordinate = self.start_coordinate
+        for i in range(pipes_number):
+            node = Node(next_coordinate, self.interpolator)
+            next_coordinate += self.segment_length
+            self.nodes.append(node)
+        last_node = Node(self.end_coordinate, self.interpolator)
+        self.nodes.append(last_node)
 
-        )
+        for j in range(pipes_number):
+            start_node = self.nodes[j]
+            end_node = self.nodes[j + 1]
+            pipe = Pipe(data, start_node, end_node)
+            self.pipes.append(pipe)
+
 
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:

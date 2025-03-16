@@ -28,8 +28,7 @@ def create_pipe(interpolator: Interpolator):
     pipe = Pipe(schema, inlet_node, outlet_node)
     return pipe
 
-
-def test_pipe_solve_inlet_head(pipe: Pipe):
+def test_solve_inlet_head(pipe: Pipe):
     flow_rate = 1.2
     pipe.outlet_node.head = 120
     inlet_head = pipe.solve_inlet_head(flow_rate)
@@ -37,7 +36,7 @@ def test_pipe_solve_inlet_head(pipe: Pipe):
     assert pipe.inlet_node.head < 1000
 
 
-def test_pipe_solve_outlet_temperature(pipe: Pipe):
+def test_solve_outlet_temperature(pipe: Pipe):
     flow_rate = 0.8
     pipe.inlet_node.temperature = 330
     outlet_temperature = pipe.solve_outlet_temperature(flow_rate)

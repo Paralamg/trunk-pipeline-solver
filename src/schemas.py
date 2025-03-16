@@ -12,17 +12,11 @@ class PipeSchema(BaseModel):
     temperature_env: PositiveFloat
 
 
-class PipelineSchema(BaseModel):
-    elevation_profile: object
+class PipelineSchema(PipeSchema):
     segment_length: PositiveFloat
+    start_coordinate: float
+    end_coordinate: float
 
-    @field_validator('elevation_profile')
-    def check_elevation_profile(cls, v):
-        if not isinstance(v, np.ndarray):
-            raise ValueError('elevation_profile must be a numpy array')
-        if v.ndim != 2 or v.shape[1] != 2 or v.shape[0] < 2:
-            raise ValueError('elevation_profile must be a 2D numpy array with 2 columns and at least 2 row')
-        return v
 
 
 
