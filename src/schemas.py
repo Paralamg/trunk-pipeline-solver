@@ -26,3 +26,11 @@ class PumpStationSchema(HydraulicModelSchema):
     pump_number: PositiveInt
     min_inlet_head: PositiveFloat
     preset_outlet_temperature: float = Field(ge=0)
+
+
+class SolverSchema(BaseModel):
+    upper_border: PositiveFloat
+    lower_border: float = Field(ge=0)
+    inlet_head: PositiveFloat
+    outlet_head: PositiveFloat
+    inlet_temperature: PositiveFloat

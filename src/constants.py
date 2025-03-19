@@ -11,6 +11,7 @@ class Constants:
     temperature_viscosity_base: float = 283.15
     viscosity_base: float = 45e-6
     delta_viscosity: float = 0.0366
+    ACCURACY: float = 0.001
 
 
 @lru_cache()

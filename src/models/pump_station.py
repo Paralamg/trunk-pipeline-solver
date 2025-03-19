@@ -1,7 +1,7 @@
 from typing import override
 
 from .model_base import HydraulicModelBase
-from ..interpolate import Interpolator
+from ..interpolator import Interpolator
 from ..schemas import PumpStationSchema
 
 

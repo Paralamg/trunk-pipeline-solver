@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.interpolate import Interpolator
+from src.interpolator import Interpolator
 from src.models.pipeline import Node, Pipe, Pipeline
 from src.models.pump_station import PumpStation
 from src.schemas import PipeSchema, PipelineSchema, PumpStationSchema
@@ -65,3 +65,5 @@ def get_pump_station(interpolator: Interpolator):
     )
     pump_station = PumpStation(schema, interpolator)
     return pump_station
+
+

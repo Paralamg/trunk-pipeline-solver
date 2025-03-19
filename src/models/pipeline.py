@@ -3,7 +3,7 @@ from typing import List, override
 
 from .model_base import HydraulicModelBase
 from ..constants import get_constant
-from ..interpolate import Interpolator
+from ..interpolator import Interpolator
 from ..schemas import PipeSchema, PipelineSchema
 from ..tools import get_head, get_pressure
 
@@ -108,7 +108,6 @@ class Pipeline(HydraulicModelBase):
         self.nodes: List[Node] = []
         self.segment_length: float = data.segment_length
 
-        # Сортировка по координате value
         self.length: float = abs(self.outlet_coordinate - self.inlet_coordinate)
         pipes_number = math.ceil(self.length / self.segment_length)
 

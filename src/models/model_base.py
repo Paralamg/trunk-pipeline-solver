@@ -1,6 +1,6 @@
 import abc
 
-from src.interpolate import Interpolator
+from src.interpolator import Interpolator
 from src.tools import get_pressure
 from src.schemas import HydraulicModelSchema
 
