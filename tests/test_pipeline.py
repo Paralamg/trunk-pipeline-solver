@@ -1,29 +1,9 @@
-import pytest
-
-from src.interpolate import Interpolator
 from src.models.pipeline import Pipeline
-from src.schemas import PipelineSchema
-
-
-@pytest.fixture(name="pipeline")
-def get_pipeline(interpolator: Interpolator):
-    schema = PipelineSchema(
-        outer_diameter=1.020,
-        inner_diameter=0.992,
-        roughness=0.2e-3,
-        density=860,
-        temperature_env=278.15,
-        segment_length=0.1e3,
-        inlet_coordinate=0,
-        outlet_coordinate=100e3,
-        heat_transfer=1.3
-    )
-    pipeline = Pipeline(schema, interpolator)
-    return pipeline
 
 
 def test_constructor(pipeline: Pipeline):
     assert isinstance(pipeline, Pipeline)
+
 
 def test_solve_inlet_head(pipeline: Pipeline):
     flow_rate = 1.2

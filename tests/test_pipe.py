@@ -5,21 +5,6 @@ from src.models.pipeline import Pipe, Node
 from src.schemas import PipeSchema
 
 
-@pytest.fixture(name="pipe")
-def create_pipe(interpolator: Interpolator):
-    schema = PipeSchema(
-        outer_diameter=1.020,
-        inner_diameter=0.992,
-        roughness=0.2e-3,
-        density=860,
-        temperature_env=278.15,
-        heat_transfer=1.3
-    )
-
-    inlet_node = Node(0, interpolator)
-    outlet_node = Node(100e3, interpolator)
-    pipe = Pipe(schema, inlet_node, outlet_node)
-    return pipe
 
 
 def test_solve_inlet_head(pipe: Pipe):

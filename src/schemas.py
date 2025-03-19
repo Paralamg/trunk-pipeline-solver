@@ -19,8 +19,10 @@ class PipeSchema(BaseModel):
 class PipelineSchema(HydraulicModelSchema, PipeSchema):
     segment_length: PositiveFloat
 
-class PumpStationSchema(BaseModel):
+
+class PumpStationSchema(HydraulicModelSchema):
     a: PositiveFloat
     b: PositiveFloat
     pump_number: PositiveInt
     min_inlet_head: PositiveFloat
+    preset_outlet_temperature: float = Field(ge=0)

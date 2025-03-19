@@ -2,10 +2,10 @@ import math
 from typing import List, override
 
 from .model_base import HydraulicModelBase
-from ..tools import get_head, get_pressure
 from ..constants import get_constant
 from ..interpolate import Interpolator
 from ..schemas import PipeSchema, PipelineSchema
+from ..tools import get_head, get_pressure
 
 constant = get_constant()
 
@@ -102,12 +102,11 @@ class Pipe():
 
 class Pipeline(HydraulicModelBase):
     def __init__(self, data: PipelineSchema, interpolator: Interpolator):
-        super().__init__(data)
+        super().__init__(data, interpolator)
 
         self.pipes: List[Pipe] = []
         self.nodes: List[Node] = []
         self.segment_length: float = data.segment_length
-        self.interpolator = interpolator
 
         # Сортировка по координате value
         self.length: float = abs(self.outlet_coordinate - self.inlet_coordinate)
@@ -129,14 +128,24 @@ class Pipeline(HydraulicModelBase):
 
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
+        self.outlet_head = outlet_head
+        self.flow_rate = flow_rate
+
         self.nodes[-1].head = outlet_head
         for pipe in self.pipes[::-1]:
             pipe.solve_inlet_head(flow_rate)
-        return self.nodes[0].head
+
+        self.inlet_head = self.nodes[0].head
+        return self.inlet_head
 
     @override
     def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
+        self.flow_rate = flow_rate
+        self.inlet_temperature = inlet_temperature
+
         self.nodes[0].temperature = inlet_temperature
         for pipe in self.pipes:
             pipe.solve_outlet_temperature(flow_rate)
-        return self.nodes[-1].temperature
+
+        self.outlet_temperature = self.nodes[-1].temperature
+        return self.outlet_temperature

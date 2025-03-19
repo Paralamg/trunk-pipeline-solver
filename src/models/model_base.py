@@ -1,11 +1,12 @@
 import abc
 
+from src.interpolate import Interpolator
 from src.tools import get_pressure
 from src.schemas import HydraulicModelSchema
 
 
 class HydraulicModelBase(abc.ABC):
-    def __init__(self, data: HydraulicModelSchema):
+    def __init__(self, data: HydraulicModelSchema, interpolator: Interpolator):
         self.inlet_head: float | None = None
         self.inlet_temperature: float | None = None
         self.inlet_coordinate: float = data.inlet_coordinate
@@ -16,7 +17,9 @@ class HydraulicModelBase(abc.ABC):
         self.outlet_coordinate: float = data.outlet_coordinate
         self.outlet_elevation: float | None = None
 
+        self.interpolator = interpolator
         self.density: float = data.density
+        self.flow_rate: float | None = None
 
     @property
     def inlet_pressure(self):
