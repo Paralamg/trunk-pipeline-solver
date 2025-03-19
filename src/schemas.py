@@ -1,7 +1,10 @@
-from collections import OrderedDict
+from pydantic import BaseModel, PositiveFloat, PositiveInt, Field
 
-import numpy as np
-from pydantic import BaseModel, PositiveFloat, field_validator
+
+class HydraulicModelSchema(BaseModel):
+    density: PositiveFloat
+    inlet_coordinate: float
+    outlet_coordinate: float
 
 
 class PipeSchema(BaseModel):
@@ -13,13 +16,11 @@ class PipeSchema(BaseModel):
     heat_transfer: PositiveFloat
 
 
-class PipelineSchema(PipeSchema):
+class PipelineSchema(HydraulicModelSchema, PipeSchema):
     segment_length: PositiveFloat
-    start_coordinate: float
-    end_coordinate: float
 
-
-
-
-
-
+class PumpStationSchema(BaseModel):
+    a: PositiveFloat
+    b: PositiveFloat
+    pump_number: PositiveInt
+    min_inlet_head: PositiveFloat

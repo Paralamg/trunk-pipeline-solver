@@ -2,21 +2,12 @@ import math
 from typing import List, override
 
 from .model_base import HydraulicModelBase
+from ..tools import get_head, get_pressure
 from ..constants import get_constant
 from ..interpolate import Interpolator
 from ..schemas import PipeSchema, PipelineSchema
 
 constant = get_constant()
-
-
-def get_pressure(head: float, density: float) -> float:
-    pressure = head * constant.gravity * density
-    return pressure
-
-
-def get_head(pressure: float, density: float) -> float:
-    head = pressure / (constant.gravity * density)
-    return head
 
 
 class Node():
@@ -111,23 +102,23 @@ class Pipe():
 
 class Pipeline(HydraulicModelBase):
     def __init__(self, data: PipelineSchema, interpolator: Interpolator):
+        super().__init__(data)
+
         self.pipes: List[Pipe] = []
         self.nodes: List[Node] = []
         self.segment_length: float = data.segment_length
-        self.start_coordinate = data.start_coordinate
-        self.end_coordinate = data.end_coordinate
         self.interpolator = interpolator
 
         # Сортировка по координате value
-        self.length: float = abs(self.end_coordinate - self.start_coordinate)
+        self.length: float = abs(self.outlet_coordinate - self.inlet_coordinate)
         pipes_number = math.ceil(self.length / self.segment_length)
 
-        next_coordinate = self.start_coordinate
+        next_coordinate = self.inlet_coordinate
         for i in range(pipes_number):
             node = Node(next_coordinate, self.interpolator)
             next_coordinate += self.segment_length
             self.nodes.append(node)
-        last_node = Node(self.end_coordinate, self.interpolator)
+        last_node = Node(self.outlet_coordinate, self.interpolator)
         self.nodes.append(last_node)
 
         for j in range(pipes_number):

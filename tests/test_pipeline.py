@@ -14,8 +14,8 @@ def get_pipeline(interpolator: Interpolator):
         density=860,
         temperature_env=278.15,
         segment_length=0.1e3,
-        start_coordinate=0,
-        end_coordinate=100e3,
+        inlet_coordinate=0,
+        outlet_coordinate=100e3,
         heat_transfer=1.3
     )
     pipeline = Pipeline(schema, interpolator)

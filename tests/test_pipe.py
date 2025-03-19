@@ -1,10 +1,8 @@
-import numpy as np
 import pytest
 
 from src.interpolate import Interpolator
 from src.models.pipeline import Pipe, Node
 from src.schemas import PipeSchema
-
 
 
 @pytest.fixture(name="pipe")
@@ -22,6 +20,7 @@ def create_pipe(interpolator: Interpolator):
     outlet_node = Node(100e3, interpolator)
     pipe = Pipe(schema, inlet_node, outlet_node)
     return pipe
+
 
 def test_solve_inlet_head(pipe: Pipe):
     flow_rate = 1.2

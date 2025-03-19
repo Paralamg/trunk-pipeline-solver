@@ -1,7 +1,32 @@
 import abc
 
+from src.tools import get_pressure
+from src.schemas import HydraulicModelSchema
+
 
 class HydraulicModelBase(abc.ABC):
+    def __init__(self, data: HydraulicModelSchema):
+        self.inlet_head: float | None = None
+        self.inlet_temperature: float | None = None
+        self.inlet_coordinate: float = data.inlet_coordinate
+        self.inlet_elevation: float | None = None
+
+        self.outlet_head: float | None = None
+        self.outlet_temperature: float | None = None
+        self.outlet_coordinate: float = data.outlet_coordinate
+        self.outlet_elevation: float | None = None
+
+        self.density: float = data.density
+
+    @property
+    def inlet_pressure(self):
+        return get_pressure(self.inlet_head - self.inlet_elevation, self.density)
+
+    @property
+    def outlet_pressure(self):
+        return get_pressure(self.outlet_head - self.outlet_elevation, self.density)
+
+
     @abc.abstractmethod
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
         """
@@ -22,3 +47,4 @@ class HydraulicModelBase(abc.ABC):
         :return: Температура в конечной точке, К.
         """
         pass
+
