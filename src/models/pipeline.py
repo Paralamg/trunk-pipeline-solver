@@ -56,8 +56,8 @@ class Pipe():
         self.flow_rate = flow_rate
 
         calc_lambda = self.__get_lambda(self.flow_rate)
-        head_loss = (1.02 * calc_lambda * self.length * 8 * self.flow_rate ** 2 /
-                     (self.inner_diameter ** 5 * math.pi ** 2 * constant.gravity))
+        head_loss = (1.02 * calc_lambda * self.length * 8 * self.flow_rate ** 2
+                     / (self.inner_diameter ** 5 * math.pi ** 2 * constant.gravity))
         self.inlet_node.head = self.outlet_node.head + head_loss
 
         # Проверка на самотечные участки
@@ -67,14 +67,14 @@ class Pipe():
 
         return self.inlet_node.head
 
-    def solve_outlet_temperature(self, flow_rate: float) -> float:
+    def solve_outlet_temperature(self) -> float:
         a = (math.pi * self.heat_transfer * self.inner_diameter /
-             (self.density * flow_rate * constant.heat_capacity))
+             (self.density * self.flow_rate * constant.heat_capacity))
 
         self.outlet_node.temperature = self.inlet_node.temperature - a * (
                 self.inlet_node.temperature - self.temperature_env) * self.length
 
-        # Прибавка по гидравлическому уклону
+        # Прибавка по трению
         if self.inlet_node.head and self.outlet_node.head:
             i = (self.inlet_node.head - self.outlet_node.head) / self.length
             self.outlet_node.temperature += constant.gravity * i / constant.heat_capacity * self.length
@@ -138,13 +138,13 @@ class Pipeline(HydraulicModelBase):
         return self.inlet_head
 
     @override
-    def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
-        self.flow_rate = flow_rate
+    def solve_outlet_temperature(self, inlet_temperature: float) -> float:
+
         self.inlet_temperature = inlet_temperature
 
         self.nodes[0].temperature = inlet_temperature
         for pipe in self.pipes:
-            pipe.solve_outlet_temperature(flow_rate)
+            pipe.solve_outlet_temperature()
 
         self.outlet_temperature = self.nodes[-1].temperature
         return self.outlet_temperature

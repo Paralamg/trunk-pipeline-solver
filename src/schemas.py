@@ -34,3 +34,7 @@ class SolverSchema(BaseModel):
     inlet_head: PositiveFloat
     outlet_head: PositiveFloat
     inlet_temperature: PositiveFloat
+
+
+class HookupSchema(HydraulicModelSchema):
+    flow_rate: float

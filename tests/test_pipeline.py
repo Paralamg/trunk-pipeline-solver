@@ -18,6 +18,6 @@ def test_solve_outlet_temperature(pipeline: Pipeline):
     outlet_head = 120
     inlet_temperature = 300
     inlet_head = pipeline.solve_inlet_head(flow_rate, outlet_head)
-    outlet_temperature = pipeline.solve_outlet_temperature(flow_rate, inlet_temperature)
+    outlet_temperature = pipeline.solve_outlet_temperature(inlet_temperature)
     assert outlet_temperature < inlet_temperature - 2
     assert outlet_temperature > 270

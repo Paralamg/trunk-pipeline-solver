@@ -2,9 +2,10 @@ import numpy as np
 import pytest
 
 from src.interpolator import Interpolator
+from src.models import Hookup
 from src.models.pipeline import Node, Pipe, Pipeline
 from src.models.pump_station import PumpStation
-from src.schemas import PipeSchema, PipelineSchema, PumpStationSchema
+from src.schemas import PipeSchema, PipelineSchema, PumpStationSchema, HookupSchema
 
 
 @pytest.fixture(name="interpolator")
@@ -43,9 +44,25 @@ def get_pipeline(interpolator: Interpolator):
         roughness=0.2e-3,
         density=860,
         temperature_env=278.15,
-        segment_length=0.1e3,
+        segment_length=100,
         inlet_coordinate=0,
         outlet_coordinate=100e3,
+        heat_transfer=1.3
+    )
+    pipeline = Pipeline(schema, interpolator)
+    return pipeline
+
+@pytest.fixture(name="pipeline_2")
+def get_pipeline_2(interpolator: Interpolator):
+    schema = PipelineSchema(
+        outer_diameter=1.020,
+        inner_diameter=0.992,
+        roughness=0.2e-3,
+        density=860,
+        temperature_env=278.15,
+        segment_length=100,
+        inlet_coordinate=0,
+        outlet_coordinate=10e3,
         heat_transfer=1.3
     )
     pipeline = Pipeline(schema, interpolator)
@@ -56,14 +73,24 @@ def get_pump_station(interpolator: Interpolator):
     schema = PumpStationSchema(
         density=860,
         inlet_coordinate=0,
-        outlet_coordinate=100e3,
+        outlet_coordinate=0,
         a=273.0074080570295,
         b=1.2519107926468433e-05,
-        pump_number=1,
-        min_inlet_head=100,
+        pump_number=2,
+        min_inlet_head=40,
         preset_outlet_temperature=300,
     )
     pump_station = PumpStation(schema, interpolator)
     return pump_station
 
+@pytest.fixture(name="hookup")
+def get_hookup(interpolator: Interpolator):
+    schema = HookupSchema(
+        density=860,
+        inlet_coordinate=0,
+        outlet_coordinate=0,
+        flow_rate=0.2,
+    )
+    hookup = Hookup(schema, interpolator)
+    return hookup
 

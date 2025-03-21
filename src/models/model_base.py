@@ -10,12 +10,10 @@ class HydraulicModelBase(abc.ABC):
         self.inlet_head: float | None = None
         self.inlet_temperature: float | None = None
         self.inlet_coordinate: float = data.inlet_coordinate
-        self.inlet_elevation: float | None = None
 
         self.outlet_head: float | None = None
         self.outlet_temperature: float | None = None
         self.outlet_coordinate: float = data.outlet_coordinate
-        self.outlet_elevation: float | None = None
 
         self.interpolator = interpolator
         self.density: float = data.density
@@ -29,6 +27,14 @@ class HydraulicModelBase(abc.ABC):
     def outlet_pressure(self):
         return get_pressure(self.outlet_head - self.outlet_elevation, self.density)
 
+    @property
+    def inlet_elevation(self):
+        return self.interpolator(self.inlet_coordinate)
+
+    @property
+    def outlet_elevation(self):
+        return self.interpolator(self.outlet_coordinate)
+
 
     @abc.abstractmethod
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
@@ -41,12 +47,11 @@ class HydraulicModelBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
+    def solve_outlet_temperature(self, inlet_temperature: float) -> float:
         """
         Рассчитывает температуру в конечной точке объекта по известной температуре в начальной точке
         и расходу нефти.
         :param inlet_temperature:
-        :param flow_rate: Расход, m3/c.
         :return: Температура в конечной точке, К.
         """
         pass

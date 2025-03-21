@@ -23,13 +23,12 @@ class PumpStation(HydraulicModelBase):
         delta_head = self.pump_number * (self.a - self.b * (flow_rate * 3600) ** 2)
         self.inlet_head = outlet_head - delta_head
 
-        if self.inlet_head > self.min_inlet_head:
+        if self.inlet_head - self.inlet_elevation > self.min_inlet_head:
             return self.inlet_head
         return None
 
     @override
-    def solve_outlet_temperature(self, flow_rate: float, inlet_temperature: float) -> float:
-        self.flow_rate = flow_rate
+    def solve_outlet_temperature(self, inlet_temperature: float) -> float:
         self.inlet_temperature = inlet_temperature
 
         if self.preset_outlet_temperature:
