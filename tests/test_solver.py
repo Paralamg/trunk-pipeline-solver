@@ -1,6 +1,7 @@
 from src.models import Pipeline, PumpStation, Hookup
 from src.schemas import SolverSchema
 from src.solver import Solver
+from src.plotter import Plotter
 
 
 def test_solve_one_pipe(pipeline: Pipeline):
@@ -30,12 +31,13 @@ def test_solve_pump_and_pipe(pipeline: Pipeline, pump_station: PumpStation):
     models = [pump_station, pipeline]
     solver = Solver(models, schema)
     solver.solve()
+
     assert 0.5 < models[0].flow_rate < 1
     assert abs(models[0].inlet_head - schema.inlet_head) < 0.5
     assert abs(models[1].outlet_head - schema.outlet_head) < 0.5
 
 
-def test_solve_pump_and_pipe(pipeline: Pipeline, pipeline_2: Pipeline, pump_station: PumpStation, hookup: Hookup):
+def test_solve_pump_pipe_hookup(pipeline: Pipeline, pipeline_2: Pipeline, pump_station: PumpStation, hookup: Hookup):
     schema = SolverSchema(
         upper_border=20,
         lower_border=0,

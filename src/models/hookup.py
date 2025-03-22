@@ -20,4 +20,3 @@ class Hookup(HydraulicModelBase):
     def solve_outlet_temperature(self, inlet_temperature: float) -> float:
         self.inlet_temperature = self.outlet_temperature = inlet_temperature
         return inlet_temperature
-

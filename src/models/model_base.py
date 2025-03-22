@@ -56,3 +56,11 @@ class HydraulicModelBase(abc.ABC):
         """
         pass
 
+    def get_plot_data(self):
+        coordinate_data = [self.inlet_coordinate, self.outlet_coordinate]
+        head_data = [self.inlet_head, self.outlet_head]
+        elevation_data = [self.inlet_elevation, self.outlet_elevation]
+        temperature_data = [self.inlet_temperature, self.outlet_temperature]
+
+        return coordinate_data, head_data, elevation_data, temperature_data
+

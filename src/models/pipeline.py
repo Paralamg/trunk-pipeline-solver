@@ -148,3 +148,18 @@ class Pipeline(HydraulicModelBase):
 
         self.outlet_temperature = self.nodes[-1].temperature
         return self.outlet_temperature
+
+    @override
+    def get_plot_data(self):
+        coordinate_data = []
+        head_data = []
+        temperature_data = []
+        elevation_data = []
+        for node in self.nodes:
+            coordinate_data.append(node.x)
+            head_data.append(node.head)
+            temperature_data.append(node.temperature)
+            elevation_data.append(node.elevation)
+        return coordinate_data, head_data, elevation_data, temperature_data
+
+

@@ -13,7 +13,7 @@ class PumpStation(HydraulicModelBase):
         self.b = data.b
         self.pump_number = data.pump_number
         self.min_inlet_head = data.min_inlet_head
-        self.preset_outlet_temperature = data.preset_outlet_temperature
+        self.preset_outlet_temperature = self.outlet_temperature = data.preset_outlet_temperature
 
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float | None:
