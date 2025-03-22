@@ -61,6 +61,7 @@ class HydraulicModelBase(abc.ABC):
         head_data = [self.inlet_head, self.outlet_head]
         elevation_data = [self.inlet_elevation, self.outlet_elevation]
         temperature_data = [self.inlet_temperature, self.outlet_temperature]
+        head_max_data = [None, None]
 
-        return coordinate_data, head_data, elevation_data, temperature_data
+        return coordinate_data, head_data, elevation_data, temperature_data, head_max_data
 

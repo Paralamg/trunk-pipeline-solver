@@ -52,6 +52,8 @@ class Pipe():
     def length(self):
         return abs(self.outlet_node.x - self.inlet_node.x)
 
+
+
     def solve_inlet_head(self, flow_rate: float) -> float:
         self.flow_rate = flow_rate
 
@@ -107,6 +109,10 @@ class Pipeline(HydraulicModelBase):
         self.pipes: List[Pipe] = []
         self.nodes: List[Node] = []
         self.segment_length: float = data.segment_length
+        self.temperature_env = data.temperature_env
+        self.inner_diameter = data.inner_diameter
+        self.outer_diameter = data.outer_diameter
+        self.thickness = (self.outer_diameter - self.inner_diameter) / 2
 
         self.length: float = abs(self.outlet_coordinate - self.inlet_coordinate)
         pipes_number = math.ceil(self.length / self.segment_length)
@@ -124,6 +130,15 @@ class Pipeline(HydraulicModelBase):
             end_node = self.nodes[j + 1]
             pipe = Pipe(data, start_node, end_node)
             self.pipes.append(pipe)
+
+    @property
+    def pressure_max(self):
+        pressure_max = constant.R1 * 2 * self.thickness / constant.n / self.inner_diameter
+        return pressure_max
+
+    @property
+    def head_max(self):
+        return get_head(self.pressure_max, self.density)
 
     @override
     def solve_inlet_head(self, flow_rate: float, outlet_head: float) -> float:
@@ -155,11 +170,17 @@ class Pipeline(HydraulicModelBase):
         head_data = []
         temperature_data = []
         elevation_data = []
+        head_max_data = []
+
+        head_max = self.head_max
         for node in self.nodes:
             coordinate_data.append(node.x)
             head_data.append(node.head)
             temperature_data.append(node.temperature)
             elevation_data.append(node.elevation)
-        return coordinate_data, head_data, elevation_data, temperature_data
+            head_max_data.append(head_max + node.elevation)
+        return coordinate_data, head_data, elevation_data, temperature_data, head_max_data
+
+
 
 
