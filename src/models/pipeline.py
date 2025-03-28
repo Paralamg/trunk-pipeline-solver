@@ -75,6 +75,13 @@ class Pipe():
 
         # Проверка на самотечные участки
         if self.inlet_pressure < constant.saturated_vapour_pressure:
+            if not self.outlet_node.is_self_flow:
+                i = (self.inlet_node.head - self.outlet_node.head) / self.length
+                devider = (self.outlet_node.elevation - self.inlet_node.elevation + i * (self.outlet_node.x - self.inlet_node.x))
+                
+                self.inlet_node.x = self.outlet_node.x + ((self.outlet_node.head - self.outlet_node.elevation - get_head(constant.saturated_vapour_pressure, self.density)) 
+                   / devider * (self.outlet_node.x - self.inlet_node.x)) 
+            
             self.inlet_node.is_self_flow = True
             self.inlet_node.head = get_head(constant.saturated_vapour_pressure,
                                             self.density) + self.inlet_node.elevation
@@ -207,7 +214,8 @@ class Pipeline(HydraulicModelBase):
     def _find_self_flows(self):
         current_status = False
         self_flow: SelfFlow | None = None
-        for node in self.nodes:
+        for i in range(len(self.nodes)):
+            node = self.nodes[i]
             if node.is_self_flow and not current_status:
                 self_flow = SelfFlow()
                 self_flow.start_coordinate = node.x
@@ -215,9 +223,10 @@ class Pipeline(HydraulicModelBase):
                 self.self_flows.append(self_flow)
                 current_status = True
 
-            if current_status and not node.is_self_flow: 
-                self.self_flows[-1].end_coordinate = node.x
-                self.self_flows[-1].end_elevation = node.elevation
+            if current_status and not node.is_self_flow:
+                end_node = self.nodes[i - 1]
+                self.self_flows[-1].end_coordinate = end_node.x
+                self.self_flows[-1].end_elevation = end_node.elevation
                 self.self_flows[-1].filling_degree = self._get_filling_degree(self.self_flows[-1])
                 current_status = False
 
