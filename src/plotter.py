@@ -48,7 +48,7 @@ class Plotter:
                 y = (self_flow.start_elevation + self_flow.end_elevation) / 2 + 200
                 
                 # Форматирование текста
-                text = f"Саматечный участок №{i}\nДлина: {self_flow.length / 1000:.3f} км\nCтепень заполнения: {self_flow.filling_degree:.2f}"
+                text = f"Саматечный участок №{i}\nДлина: {self_flow.length / 1000:.3f} км\nCтепень заполнения: {self_flow.filling_degree:.3f}"
                 bbox={"fill": False,
                    "linestyle": "solid",
                    "linewidth": 0.5}
