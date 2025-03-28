@@ -22,8 +22,11 @@ class Plotter:
         temperature_data = np.array(temperature_data) - 273.15
 
 
-        fig, axs = plt.subplots(2, 1, layout='tight')
-        fig.set_size_inches(10, 15)
+        fig, axs = plt.subplots(2, 1, layout='tight', height_ratios=[2,1])
+        fig.set_size_inches(10, 12)
+
+        
+
 
         axs[0].plot(coordinate_data, head_data, label='Линия гидравлического уклона', color='blue')
         axs[0].plot(coordinate_data, elevation_data, label='Профиль трассы', color='green')
@@ -32,7 +35,7 @@ class Plotter:
             (coordinate_data[0], coordinate_data[0]),
             (elevation_data[0], self._inlet_head),
             label='Подпор', color='red')
-        axs[0].legend(loc='right')
+        axs[0].legend(loc='best')
         axs[0].fill_between(coordinate_data, elevation_data, color='#98FB98', alpha=0.5)  # alpha задает прозрачность
 
         axs[0].set_xlabel('Координата, км')

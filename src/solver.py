@@ -22,6 +22,7 @@ class Solver:
 
         previous_flow_rate = math.inf
         flow_rate = -self._sum_hookup_flow_rate
+        calc_inlet_head = 0
         while abs(previous_flow_rate - flow_rate) > settings.ACCURACY:
             previous_flow_rate = flow_rate
 
@@ -33,6 +34,9 @@ class Solver:
                 self.upper_border = flow_rate
             else:
                 self.lower_border = flow_rate
+        
+        if calc_inlet_head is None:
+            raise Exception("Для заданной схемы решение не существует. Не сошелся напор на входе")
 
     def _solve_step(self, flow_rate: float) -> float | None:
         end_point_flow_rate = flow_rate + self._sum_hookup_flow_rate

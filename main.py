@@ -1,5 +1,7 @@
 import numpy as np
 
+from matplotlib import pyplot as plt
+
 from src.interpolator import Interpolator
 from src.models import Hookup, PumpStation, Pipeline
 from src.plotter import Plotter
@@ -31,18 +33,21 @@ def main():
     solver.solve()
     plotter = Plotter(models, solver.inlet_head)
     plot = plotter.plot()
-    plot.show()
+    plt.show()
+    
 
 
 
 def get_interpolator():
     points = np.array([(0, 100),
                        (20e3, 90),
-                       (50e3, 50),
+                       (50e3, 100),
                        (77e3, 150),
                        (120e3, 170),
-                       (150e3, 450),
+                       (150e3, 500),
                        (170e3, 150),
+                       (180e3, 300),
+                       (185e3, 100),
                        (200e3, 100)])
     interpolator = Interpolator(points[:, 0], points[:, 1])
     return interpolator
