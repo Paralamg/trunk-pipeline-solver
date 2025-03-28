@@ -22,7 +22,16 @@ class Node():
     def elevation(self) -> float:
         return self.interpolator(self.x)
 
+class SelfFlow():
+    start_coordinate: float | None
+    end_coordinate: float | None
+    start_elevation: float | None
+    end_elevation: float | None
+    filling_degree: float | None
 
+    @property
+    def length(self) -> float:
+        return abs(self.end_coordinate - self.start_coordinate)
 
 class Pipe():
     def __init__(self, data: PipeSchema, inlet_node: Node, outlet_node: Node):
@@ -58,14 +67,15 @@ class Pipe():
 
     def solve_inlet_head(self, flow_rate: float) -> float:
         self.flow_rate = flow_rate
-
         calc_lambda = self.__get_lambda(self.flow_rate)
         head_loss = (1.02 * calc_lambda * self.length * 8 * self.flow_rate ** 2
                      / (self.inner_diameter ** 5 * math.pi ** 2 * constant.gravity))
         self.inlet_node.head = self.outlet_node.head + head_loss
+        
 
         # Проверка на самотечные участки
         if self.inlet_pressure < constant.saturated_vapour_pressure:
+            self.inlet_node.is_self_flow = True
             self.inlet_node.head = get_head(constant.saturated_vapour_pressure,
                                             self.density) + self.inlet_node.elevation
 
@@ -110,6 +120,7 @@ class Pipeline(HydraulicModelBase):
 
         self.pipes: List[Pipe] = []
         self.nodes: List[Node] = []
+        self.self_flows: List[SelfFlow] = []
         self.segment_length: float = data.segment_length
         self.temperature_env = data.temperature_env
         self.inner_diameter = data.inner_diameter
@@ -147,6 +158,8 @@ class Pipeline(HydraulicModelBase):
         self.outlet_head = outlet_head
         self.flow_rate = flow_rate
 
+        self._reset_grid()
+
         self.nodes[-1].head = outlet_head
         for pipe in self.pipes[::-1]:
             pipe.solve_inlet_head(flow_rate)
@@ -173,6 +186,7 @@ class Pipeline(HydraulicModelBase):
         temperature_data = []
         elevation_data = []
         head_max_data = []
+        self._find_self_flows()
 
         head_max = self.head_max
         for node in self.nodes:
@@ -182,7 +196,44 @@ class Pipeline(HydraulicModelBase):
             elevation_data.append(node.elevation)
             head_max_data.append(head_max + node.elevation)
         return coordinate_data, head_data, elevation_data, temperature_data, head_max_data
+    
+    def _reset_grid(self):
+        next_coordinate = self.inlet_coordinate
+        for node in self.nodes:
+            node.is_self_flow = False
+            node.x = next_coordinate
+            next_coordinate += self.segment_length
 
+    def _find_self_flows(self):
+        current_status = False
+        self_flow: SelfFlow | None = None
+        for node in self.nodes:
+            if node.is_self_flow and not current_status:
+                self_flow = SelfFlow()
+                self_flow.start_coordinate = node.x
+                self_flow.start_elevation = node.elevation
+                self.self_flows.append(self_flow)
+                current_status = True
 
+            if current_status and not node.is_self_flow: 
+                self.self_flows[-1].end_coordinate = node.x
+                self.self_flows[-1].end_elevation = node.elevation
+                self.self_flows[-1].filling_degree = self._get_filling_degree(self.self_flows[-1])
+                current_status = False
 
-
+    def _get_filling_degree(self, self_flow: SelfFlow):
+        sin_alpha = (self_flow.start_elevation - self_flow.end_elevation) / (self_flow.length)
+        upper_border = 360
+        lower_border = 0
+        while upper_border - lower_border > 0.01:
+            phi = (upper_border + lower_border) / 2
+            factor = (phi - math.sin(phi)) ** (5 / 3) / phi ** (2 / 3) - 0.2419 * self.flow_rate / self.inner_diameter ** (8 / 3) / math.sqrt(abs(sin_alpha))
+            if factor > 0:
+                upper_border = phi
+            else:
+                lower_border = phi
+        
+        phi = upper_border
+        filling_degree = (phi - math.sin(phi)) / 2 / math.pi
+        return filling_degree
+                

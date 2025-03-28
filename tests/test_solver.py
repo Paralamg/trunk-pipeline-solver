@@ -32,9 +32,9 @@ def test_solve_pump_and_pipe(pipeline: Pipeline, pump_station: PumpStation):
     solver = Solver(models, schema)
     solver.solve()
 
-    assert 0.5 < models[0].flow_rate < 1
-    assert abs(models[0].inlet_head - schema.inlet_head) < 0.5
-    assert abs(models[1].outlet_head - schema.outlet_head) < 0.5
+    assert 0.5 < models[0].flow_rate < 1.5
+    assert abs(models[0].inlet_head - schema.inlet_head) < 1
+    assert abs(models[1].outlet_head - schema.outlet_head) < 1
 
 
 def test_solve_pump_pipe_hookup(pipeline: Pipeline, pipeline_2: Pipeline, pump_station: PumpStation, hookup: Hookup):

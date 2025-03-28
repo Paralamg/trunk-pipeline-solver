@@ -20,7 +20,7 @@ class Interpolator:
         :param value: Координата, для которой нужно найти значение.
         :return: Интерполированное значение.
         """
-        return np.interp(value, self.coords, self.values)  # Используем линейную интерполяцию
+        return float(np.interp(value, self.coords, self.values))  # Используем линейную интерполяцию 
 
 
 if __name__ == '__main__':

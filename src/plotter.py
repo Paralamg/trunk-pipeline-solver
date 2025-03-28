@@ -2,8 +2,10 @@ from typing import List
 
 import numpy as np
 from matplotlib import pyplot as plt
+import matplotlib.patches as patches
 
 from src.models import HydraulicModelBase, Pipeline
+from src.models.pipeline import SelfFlow
 
 
 class Plotter:
@@ -15,6 +17,7 @@ class Plotter:
         self._inlet_head = inlet_head
         self._temperature_env = None
         self._models = models
+        self.self_flows: List[SelfFlow] = []
 
     def plot(self) -> plt.Figure:
         coordinate_data, head_data, elevation_data, temperature_data, head_max_data = self._get_plot_data()
@@ -35,6 +38,24 @@ class Plotter:
             (coordinate_data[0], coordinate_data[0]),
             (elevation_data[0], self._inlet_head),
             label='Подпор', color='red')
+        if self.self_flows:
+            i = 1
+            for self_flow in self.self_flows:
+                
+                axs[0].plot([self_flow.start_coordinate / 1000, self_flow.end_coordinate / 1000], [self_flow.start_elevation, self_flow.end_elevation], color='red')
+                
+                x = (self_flow.start_coordinate + self_flow.end_coordinate) / 2 / 1000
+                y = (self_flow.start_elevation + self_flow.end_elevation) / 2 + 200
+                
+                # Форматирование текста
+                text = f"Саматечный участок №{i}\nДлина: {self_flow.length / 1000:.3f} км\nCтепень заполнения: {self_flow.filling_degree:.2f}"
+                bbox={"fill": False,
+                   "linestyle": "solid",
+                   "linewidth": 0.5}
+               
+                axs[0].text(x, y, text, bbox=bbox, fontsize=10, ha='center', va='center')
+                i += 1
+
         axs[0].legend(loc='best')
         axs[0].fill_between(coordinate_data, elevation_data, color='#98FB98', alpha=0.5)  # alpha задает прозрачность
 
@@ -72,5 +93,7 @@ class Plotter:
 
             if isinstance(model, Pipeline):
                 self._temperature_env = model.temperature_env
+                self.self_flows += model.self_flows
+
 
         return coordinate_data, head_data, elevation_data, temperature_data, head_max_data

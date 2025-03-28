@@ -16,7 +16,7 @@ def main():
         lower_border=0,
         inlet_head=150,
         outlet_head=120,
-        inlet_temperature=300,
+        inlet_temperature=310,
     )
 
     models = [
