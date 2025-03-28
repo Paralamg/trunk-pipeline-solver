@@ -16,10 +16,12 @@ class Node():
         self.head: float | None = None
         self.temperature: float | None = None
         self.interpolator = interpolator
+        self.is_self_flow: bool = False
 
     @property
     def elevation(self) -> float:
         return self.interpolator(self.x)
+
 
 
 class Pipe():

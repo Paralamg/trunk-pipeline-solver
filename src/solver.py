@@ -50,6 +50,8 @@ class Solver:
                 flow_rate -= model.hookup_flow_rate
 
             model_outlet_head = model.solve_inlet_head(flow_rate, model_outlet_head)
+            if model_outlet_head is None:
+                return None
         return model_outlet_head
 
     def _solve_thermal(self):

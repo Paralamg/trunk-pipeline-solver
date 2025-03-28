@@ -18,7 +18,6 @@ class Plotter:
 
     def plot(self) -> plt.Figure:
         coordinate_data, head_data, elevation_data, temperature_data, head_max_data = self._get_plot_data()
-        head_data[0] = elevation_data[0]
         coordinate_data = np.array(coordinate_data) / 1e3
         temperature_data = np.array(temperature_data) - 273.15
 
@@ -29,6 +28,10 @@ class Plotter:
         axs[0].plot(coordinate_data, head_data, label='Линия гидравлического уклона', color='blue')
         axs[0].plot(coordinate_data, elevation_data, label='Профиль трассы', color='green')
         axs[0].plot(coordinate_data, head_max_data, label='Максимальный напор', color='red', linestyle='--')
+        axs[0].plot(
+            (coordinate_data[0], coordinate_data[0]),
+            (elevation_data[0], self._inlet_head),
+            label='Подпор', color='red')
         axs[0].legend(loc='right')
         axs[0].fill_between(coordinate_data, elevation_data, color='#98FB98', alpha=0.5)  # alpha задает прозрачность
 
@@ -37,8 +40,8 @@ class Plotter:
         axs[0].grid(True)
 
         axs[1].plot(coordinate_data, temperature_data, label='Линия изменения температуры', color='blue')
-        if self._temperature_env:
-            axs[1].axhline(y=self._temperature_env - 273.15, color='red', linestyle='--', label='Температура окружающей среды')
+        # if self._temperature_env:
+        #     axs[1].axhline(y=self._temperature_env - 273.15, color='red', linestyle='--', label='Температура окружающей среды')
         axs[1].legend(loc='right')
         axs[1].set_xlabel('Координата, км')
         axs[1].set_ylabel('Температура, С')

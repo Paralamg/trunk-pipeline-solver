@@ -9,10 +9,6 @@ from src.solver import Solver
 
 def main():
     interpolator = get_interpolator()
-    pipe1 = get_pipeline(interpolator, 0, 40e3)
-    pipe2 = get_pipeline(interpolator, 40e3, 100e3)
-    pump_station = get_pump_station(interpolator, 0)
-    hookup = get_hookup(interpolator, 40e3, -0.5)
     schema = SolverSchema(
         upper_border=20,
         lower_border=0,
@@ -20,7 +16,17 @@ def main():
         outlet_head=120,
         inlet_temperature=300,
     )
-    models = [pump_station, pipe1, hookup, pipe2]
+
+    models = [
+        get_pump_station(interpolator, 0),
+        get_pipeline(interpolator, 0, 80e3),
+        get_hookup(interpolator, 80e3, 0.5),
+        get_pipeline(interpolator, 80e3, 100e3),
+        get_pump_station(interpolator, 100e3),
+        get_pipeline(interpolator, 100e3, 130e3),
+        get_hookup(interpolator, 130e3, -0.5),
+        get_pipeline(interpolator, 130e3, 200e3),
+    ]
     solver = Solver(models, schema)
     solver.solve()
     plotter = Plotter(models, solver.inlet_head)
@@ -35,7 +41,7 @@ def get_interpolator():
                        (50e3, 50),
                        (77e3, 150),
                        (120e3, 170),
-                       (150e3, 300),
+                       (150e3, 450),
                        (170e3, 150),
                        (200e3, 100)])
     interpolator = Interpolator(points[:, 0], points[:, 1])
@@ -67,7 +73,7 @@ def get_pump_station(interpolator: Interpolator, coordinate: float):
         b=1.2519107926468433e-06,
         pump_number=3,
         min_inlet_head=40,
-        preset_outlet_temperature=300,
+        preset_outlet_temperature=310,
     )
     pump_station = PumpStation(schema, interpolator)
     return pump_station
