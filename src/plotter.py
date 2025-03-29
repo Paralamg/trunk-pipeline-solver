@@ -1,6 +1,7 @@
 from typing import List
 
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 
@@ -27,7 +28,7 @@ class Plotter:
         temperature_data = np.array(temperature_data) - 273.15
         head_data = np.array(head_data)
         series = pd.Series(head_max_data)
-        head_max_data = 
+        head_max_data = series.fillna(method='backfill').values
         elevation_data = np.array(elevation_data)
 
         density = self._models[0].density
@@ -75,13 +76,13 @@ class Plotter:
 
         
         axs[1].plot(coordinate_data, pressure_data, label='Линия изменения давления', color='blue') 
-        axs[1].plot(coordinate_data, max_pressure_data, label='Линия максимального давления', color='blue')
+        axs[1].plot(coordinate_data, max_pressure_data, label='Линия максимального давления', color='red', linestyle='--')
         axs[1].legend(loc='best')
         axs[1].set_xlabel('Координата, км')
         axs[1].set_ylabel('Давление, MPa') 
         axs[1].grid(True)
 
-        axs[1].plot(coordinate_data, temperature_data, label='Линия изменения температуры', color='blue')
+        axs[2].plot(coordinate_data, temperature_data, label='Линия изменения температуры', color='blue')
         axs[2].legend(loc='best')
         axs[2].set_xlabel('Координата, км')
         axs[2].set_ylabel('Температура, С')
