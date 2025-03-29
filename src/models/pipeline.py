@@ -22,6 +22,7 @@ class Node():
     def elevation(self) -> float:
         return self.interpolator(self.x)
 
+
 class SelfFlow():
     start_coordinate: float | None
     end_coordinate: float | None
@@ -32,6 +33,7 @@ class SelfFlow():
     @property
     def length(self) -> float:
         return abs(self.end_coordinate - self.start_coordinate)
+
 
 class Pipe():
     def __init__(self, data: PipeSchema, inlet_node: Node, outlet_node: Node):
@@ -63,25 +65,25 @@ class Pipe():
     def length(self):
         return abs(self.outlet_node.x - self.inlet_node.x)
 
-
-
     def solve_inlet_head(self, flow_rate: float) -> float:
         self.flow_rate = flow_rate
         calc_lambda = self.__get_lambda(self.flow_rate)
         head_loss = (1.02 * calc_lambda * self.length * 8 * self.flow_rate ** 2
                      / (self.inner_diameter ** 5 * math.pi ** 2 * constant.gravity))
         self.inlet_node.head = self.outlet_node.head + head_loss
-        
 
         # Проверка на самотечные участки
         if self.inlet_pressure < constant.saturated_vapour_pressure:
             if not self.outlet_node.is_self_flow:
                 i = (self.inlet_node.head - self.outlet_node.head) / self.length
-                product = (self.outlet_node.elevation - self.inlet_node.elevation + i * (self.outlet_node.x - self.inlet_node.x))
-                
-                self.inlet_node.x = self.outlet_node.x + ((self.outlet_node.head - self.outlet_node.elevation - get_head(constant.saturated_vapour_pressure, self.density)) 
-                   / product * (self.outlet_node.x - self.inlet_node.x))
-            
+                product = (self.outlet_node.elevation - self.inlet_node.elevation + i * (
+                            self.outlet_node.x - self.inlet_node.x))
+
+                self.inlet_node.x = self.outlet_node.x + ((
+                                                                      self.outlet_node.head - self.outlet_node.elevation - get_head(
+                                                                  constant.saturated_vapour_pressure, self.density))
+                                                          / product * (self.outlet_node.x - self.inlet_node.x))
+
             self.inlet_node.is_self_flow = True
             self.inlet_node.head = get_head(constant.saturated_vapour_pressure,
                                             self.density) + self.inlet_node.elevation
@@ -156,13 +158,34 @@ class Pipeline(HydraulicModelBase):
         line = '-' * 97 + '\n'
         object_name = "Трубопровод\n"
         info = (
-                f"Координата начала:\t{self.inlet_coordinate / 1000:.3f} км\n"
-                f"Координата конца:\t{self.outlet_coordinate / 1000:.3f} км\n"
-                f"Длина:\t\t\t\t{self.length / 1000:.3f} км\n"
-                f"Количество самотечных участков: {len(self.self_flows)}\n"
-                )
-        return line + object_name + line + info
+            f"{'Координата начала':<31}{self.inlet_coordinate / 1000:10.3f} км\n"
+            f"{'Координата конца':<31}{self.outlet_coordinate / 1000:10.3f} км\n"
+            f"{'Длина':<31}{self.length / 1000:10.3f} км\n"
+            f"{'Расход':<31}{self.flow_rate:10.3f} м3/с\n"
+            f"{'Давление в начале':<31}{self.inlet_pressure / 1e6:10.3f} МПа\n"
+            f"{'Давление в конце':<31}{self.outlet_pressure / 1e6:10.3f} МПа\n"
+            f"{'Температура в начале':<31}{self.inlet_temperature - 273.15:10.2f} С\n"
+            f"{'Температура в конце':<31}{self.outlet_temperature - 273.15:10.2f} С\n"
+            f"{'Количество самотечных участков':<31}{len(self.self_flows):10}\n"
+        )
+        self_flow_info = ""
+        if self.self_flows:
 
+            self_flow_info += f"{'№':<5} {'X_нач, км':<15} {'X_кон, км':<15} {'Длина, км':<15} {'Степень заполнения':<20}\n"
+            self_flow_info += ("-" * 75) + "\n"
+
+            # Вывод данных
+            for i in range(len(self.self_flows)):
+                self_flow = self.self_flows[i]
+                self_flow_info += (
+                    f"{i + 1:<5} "
+                    f"{self_flow.start_coordinate / 1000:<15.3f} "
+                    f"{self_flow.end_coordinate / 1000:<15.3f} "
+                    f"{self_flow.length / 1000:<15.3f} "
+                    f"{self_flow.filling_degree:<20.3f}\n"
+                )
+
+        return line + object_name + line + info + self_flow_info
 
     @property
     def pressure_max(self):
@@ -216,7 +239,7 @@ class Pipeline(HydraulicModelBase):
             elevation_data.append(node.elevation)
             head_max_data.append(head_max + node.elevation)
         return coordinate_data, head_data, elevation_data, temperature_data, head_max_data
-    
+
     def _reset_grid(self):
         next_coordinate = self.inlet_coordinate
         for node in self.nodes:
@@ -249,13 +272,13 @@ class Pipeline(HydraulicModelBase):
         lower_border = 0
         while upper_border - lower_border > 0.01:
             phi = (upper_border + lower_border) / 2
-            factor = (phi - math.sin(phi)) ** (5 / 3) / phi ** (2 / 3) - 0.2419 * self.flow_rate / self.inner_diameter ** (8 / 3) / math.sqrt(abs(sin_alpha))
+            factor = (phi - math.sin(phi)) ** (5 / 3) / phi ** (
+                        2 / 3) - 0.2419 * self.flow_rate / self.inner_diameter ** (8 / 3) / math.sqrt(abs(sin_alpha))
             if factor > 0:
                 upper_border = phi
             else:
                 lower_border = phi
-        
+
         phi = upper_border
         filling_degree = (phi - math.sin(phi)) / 2 / math.pi
         return filling_degree
-                

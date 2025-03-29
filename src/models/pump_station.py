@@ -21,14 +21,14 @@ class PumpStation(HydraulicModelBase):
     def __str__(self):
         line = '-' * 97 + '\n'
         object_name = "Насосная станция\n"
-        heater_info = '' if self.preset_outlet_temperature == 0 else f"Уставка температуры: {self.preset_outlet_temperature}\n"
+        heater_info = '' if self.preset_outlet_temperature == 0 else f"{'Уставка температуры':<31}{self.preset_outlet_temperature:10}\n"
         info = (
-            f"Координата:\t\t\t{self.inlet_coordinate / 1000:.3f} км\n"
-            f"Коэффициент a:\t\t{self.a:.2f}\n"
-            f"Коэффициент b:\t\t{self.b}\n"
-            f"Количество насосов в работе: {self.pump_number}\n"
-            f"Давление в линии всасывания: {self.inlet_pressure / 1e6:.3f} МПа\n"
-            f"Давление в линии нагнетания: {self.outlet_pressure / 1e6:.3f} МПа\n"
+            f"{'Координата':<31}{self.inlet_coordinate / 1000:10.3f} км\n"
+            f"{'Коэффициент a':<31}{self.a:10.2f}\n"
+            f"{'Коэффициент b':<31}{self.b:10.2e}\n"
+            f"{'Количество насосов в работе':<31}{self.pump_number:10}\n"
+            f"{'Давление в линии всасывания':<31}{self.inlet_pressure / 1e6:10.3f} МПа\n"
+            f"{'Давление в линии нагнетания':<31}{self.outlet_pressure / 1e6:10.3f} МПа\n"
             + heater_info
 
         )

@@ -14,8 +14,10 @@ class Hookup(HydraulicModelBase):
         line = '-' * 97 + '\n'
         object_name = "Подкачка\n" if self.hookup_flow_rate >= 0 else "Отбор\n"
         info = (
-            f"Координата:\t\t\t{self.inlet_coordinate / 1000:.3f} км\n"
-            f"Расход:\t\t\t\t{abs(self.hookup_flow_rate)} м3/с\n"
+            f"{'Координата':<31}{self.inlet_coordinate / 1000:10.3f} км\n"
+            f"{'Расход':<31}{abs(self.hookup_flow_rate):10.3f} м3/с\n"
+            f"{'Давление':<31}{abs(self.inlet_pressure) / 1e6:10.3f} МПа\n"
+            f"{'Температура':<31}{abs(self.inlet_temperature) - 273.15:10.3f} С\n"
         )
         return line + object_name + line + info
 
