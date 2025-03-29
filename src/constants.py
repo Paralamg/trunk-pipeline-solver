@@ -1,3 +1,4 @@
+import math
 from functools import lru_cache
 
 
@@ -8,9 +9,11 @@ class Constants:
     gravity: float = 9.81
     saturated_vapour_pressure: float = 5e3
     heat_capacity: float = 2e3
-    temperature_viscosity_base: float = 283.15
-    viscosity_base: float = 45e-6
-    delta_viscosity: float = 0.0366
+    viscosity_1: float = 15e-6
+    temperature_viscosity_1: float = 273.15 + 40
+    viscosity_2: float = 45e-6
+    temperature_viscosity_2: float = 273.15 + 10
+    delta_viscosity: float = math.log(viscosity_1 / viscosity_2) / (temperature_viscosity_2 - temperature_viscosity_1)
     ACCURACY: float = 0.001
     # Прочностной расчет
     n: float = 1.15
@@ -22,6 +25,8 @@ class Constants:
     @property
     def R1(self):
         return self.R1n * self.m / (self.k1 * self.kn)
+
+
 
 
 @lru_cache()

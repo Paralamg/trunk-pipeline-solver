@@ -25,10 +25,11 @@ class Plotter:
     def plot(self) -> plt.Figure:
         coordinate_data, head_data, elevation_data, temperature_data, head_max_data = self._get_plot_data()
         coordinate_data = np.array(coordinate_data) / 1e3
-        temperature_data = np.array(temperature_data) - 273.15
+        series = pd.Series(temperature_data)
+        temperature_data = series.bfill().values - 273.15
         head_data = np.array(head_data)
         series = pd.Series(head_max_data)
-        head_max_data = series.fillna(method='backfill').values
+        head_max_data = series.bfill().values
         elevation_data = np.array(elevation_data)
 
         density = self._models[0].density
@@ -59,7 +60,11 @@ class Plotter:
                 y = (self_flow.start_elevation + self_flow.end_elevation) / 2 + 250
                 
                 # Форматирование текста
-                text = f"Самотечный участок №{i}\nДлина: {self_flow.length / 1000:.3f} км\nCтепень заполнения: {self_flow.filling_degree:.3f}"
+                text = (f"Самотечный участок №{i}\n"
+                        # f"Координата начала: {self_flow.start_coordinate / 1000:.3f} км\n"
+                        # f"Координата конца: {self_flow.end_coordinate / 1000:.3f} км\n"
+                        f"Длина: {self_flow.length / 1000:.3f} км\n"
+                        f"Cтепень заполнения: {self_flow.filling_degree:.3f}")
                 bbox={"fill": False,
                    "linestyle": "solid",
                    "linewidth": 0.5}
@@ -75,14 +80,14 @@ class Plotter:
         axs[0].grid(True)
 
         
-        axs[1].plot(coordinate_data, pressure_data, label='Линия изменения давления', color='blue') 
+        axs[1].plot(coordinate_data, pressure_data, label='Линия распределения давления', color='blue')
         axs[1].plot(coordinate_data, max_pressure_data, label='Линия максимального давления', color='red', linestyle='--')
         axs[1].legend(loc='best')
         axs[1].set_xlabel('Координата, км')
         axs[1].set_ylabel('Давление, MPa') 
         axs[1].grid(True)
 
-        axs[2].plot(coordinate_data, temperature_data, label='Линия изменения температуры', color='blue')
+        axs[2].plot(coordinate_data, temperature_data, label='Линия распределения температуры', color='blue')
         axs[2].legend(loc='best')
         axs[2].set_xlabel('Координата, км')
         axs[2].set_ylabel('Температура, С')

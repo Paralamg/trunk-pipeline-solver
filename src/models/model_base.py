@@ -56,6 +56,13 @@ class HydraulicModelBase(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def __str__(self):
+        """
+        Возвращает информацию об объекте для печати
+        """
+        pass
+
     def get_plot_data(self):
         coordinate_data = [self.inlet_coordinate, self.outlet_coordinate]
         head_data = [self.inlet_head, self.outlet_head]

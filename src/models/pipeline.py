@@ -77,10 +77,10 @@ class Pipe():
         if self.inlet_pressure < constant.saturated_vapour_pressure:
             if not self.outlet_node.is_self_flow:
                 i = (self.inlet_node.head - self.outlet_node.head) / self.length
-                devider = (self.outlet_node.elevation - self.inlet_node.elevation + i * (self.outlet_node.x - self.inlet_node.x))
+                product = (self.outlet_node.elevation - self.inlet_node.elevation + i * (self.outlet_node.x - self.inlet_node.x))
                 
                 self.inlet_node.x = self.outlet_node.x + ((self.outlet_node.head - self.outlet_node.elevation - get_head(constant.saturated_vapour_pressure, self.density)) 
-                   / devider * (self.outlet_node.x - self.inlet_node.x)) 
+                   / product * (self.outlet_node.x - self.inlet_node.x))
             
             self.inlet_node.is_self_flow = True
             self.inlet_node.head = get_head(constant.saturated_vapour_pressure,
@@ -117,8 +117,8 @@ class Pipe():
             return 0.11 * epsilon ** 0.25
 
     def __get_visconsity(self, temperature):
-        return constant.viscosity_base * math.exp(
-            -constant.delta_viscosity * (temperature - constant.temperature_viscosity_base))
+        return constant.viscosity_1 * math.exp(
+            -constant.delta_viscosity * (temperature - constant.temperature_viscosity_1))
 
 
 class Pipeline(HydraulicModelBase):
@@ -150,6 +150,19 @@ class Pipeline(HydraulicModelBase):
             end_node = self.nodes[j + 1]
             pipe = Pipe(data, start_node, end_node)
             self.pipes.append(pipe)
+
+    def __str__(self):
+        self._find_self_flows()
+        line = '-' * 97 + '\n'
+        object_name = "Трубопровод\n"
+        info = (
+                f"Координата начала:\t{self.inlet_coordinate / 1000:.3f} км\n"
+                f"Координата конца:\t{self.outlet_coordinate / 1000:.3f} км\n"
+                f"Длина:\t\t\t\t{self.length / 1000:.3f} км\n"
+                f"Количество самотечных участков: {len(self.self_flows)}\n"
+                )
+        return line + object_name + line + info
+
 
     @property
     def pressure_max(self):

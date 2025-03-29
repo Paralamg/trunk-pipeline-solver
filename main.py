@@ -31,6 +31,8 @@ def main():
     ]
     solver = Solver(models, schema)
     solver.solve()
+    for model in models:
+        print(model)
     plotter = Plotter(models, solver.inlet_head)
     plot = plotter.plot()
     plt.show()
@@ -49,6 +51,7 @@ def get_interpolator():
                        (180e3, 300),
                        (185e3, 100),
                        (200e3, 100)])
+
     interpolator = Interpolator(points[:, 0], points[:, 1])
     return interpolator
 
