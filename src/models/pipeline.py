@@ -111,7 +111,9 @@ class Pipe():
         d1 = 10 / epsilon
         d2 = 500 / epsilon
 
-        if re < d1:
+        if re < 2320:
+            return 64 / re
+        elif re < d1:
             return 0.3164 / re ** 0.25
         elif re < d2:
             return 0.11 * (epsilon + 68 / re) ** 0.25
@@ -154,8 +156,7 @@ class Pipeline(HydraulicModelBase):
             self.pipes.append(pipe)
 
     def __str__(self):
-        self._find_self_flows()
-        line = '-' * 97 + '\n'
+        line = '-' * 95 + '\n'
         object_name = "Трубопровод\n"
         info = (
             f"{'Координата начала':<31}{self.inlet_coordinate / 1000:10.3f} км\n"
@@ -268,7 +269,7 @@ class Pipeline(HydraulicModelBase):
 
     def _get_filling_degree(self, self_flow: SelfFlow):
         sin_alpha = (self_flow.start_elevation - self_flow.end_elevation) / (self_flow.length)
-        upper_border = 360
+        upper_border = math.pi * 2
         lower_border = 0
         while upper_border - lower_border > 0.01:
             phi = (upper_border + lower_border) / 2

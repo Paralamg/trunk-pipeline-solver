@@ -19,7 +19,7 @@ class PumpStation(HydraulicModelBase):
             self.outlet_temperature
 
     def __str__(self):
-        line = '-' * 97 + '\n'
+        line = '-' * 95 + '\n'
         object_name = "Насосная станция\n"
         heater_info = '' if self.preset_outlet_temperature == 0 else f"{'Уставка температуры':<31}{self.preset_outlet_temperature:10}\n"
         info = (

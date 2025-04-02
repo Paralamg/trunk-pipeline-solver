@@ -11,7 +11,7 @@ class Hookup(HydraulicModelBase):
         self.hookup_flow_rate = data.flow_rate
 
     def __str__(self):
-        line = '-' * 97 + '\n'
+        line = '-' * 95 + '\n'
         object_name = "Подкачка\n" if self.hookup_flow_rate >= 0 else "Отбор\n"
         info = (
             f"{'Координата':<31}{self.inlet_coordinate / 1000:10.3f} км\n"

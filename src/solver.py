@@ -2,7 +2,7 @@ import math
 from typing import List
 
 from src.constants import get_constant
-from src.models import HydraulicModelBase, Pipeline, Hookup
+from src.models import HydraulicModelBase, Hookup
 from src.schemas import SolverSchema
 
 settings = get_constant()
@@ -20,23 +20,29 @@ class Solver:
 
     def solve(self):
 
-        previous_flow_rate = math.inf
         flow_rate = -self._sum_hookup_flow_rate
-        calc_inlet_head = 0
-        while abs(previous_flow_rate - flow_rate) > settings.ACCURACY:
-            previous_flow_rate = flow_rate
+        calc_inlet_head = math.inf
+        n = 0
+        while abs(calc_inlet_head - self.inlet_head) > settings.ACCURACY and n < 100:
 
             flow_rate = (self.upper_border + self.lower_border) / 2
             calc_inlet_head = self._solve_step(flow_rate)
+
 
             # Здесь спрятана проверка на то, работает ли НПС без кавитации или нет
             if calc_inlet_head and calc_inlet_head > self.inlet_head:
                 self.upper_border = flow_rate
             else:
                 self.lower_border = flow_rate
-        
+            n += 1
+            if calc_inlet_head is None:
+                calc_inlet_head = math.inf
+
         if calc_inlet_head is None:
             raise Exception("Для заданной схемы решение не существует. Не сошелся напор на входе")
+
+        if calc_inlet_head - self.inlet_head > 0.1:
+            print("Ошибка! Для заданной схемы решение не существует. Не сошелся напор на входе")
 
     def _solve_step(self, flow_rate: float) -> float | None:
         end_point_flow_rate = flow_rate + self._sum_hookup_flow_rate

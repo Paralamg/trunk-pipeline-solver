@@ -25,16 +25,14 @@ def main():
         get_hookup(interpolator, 80e3, 0.5),
         get_pipeline(interpolator, 80e3, 100e3),
         get_pump_station(interpolator, 100e3),
-        get_pipeline(interpolator, 100e3, 130e3),
-        get_hookup(interpolator, 130e3, -0.5),
-        get_pipeline(interpolator, 130e3, 200e3),
+        get_pipeline(interpolator, 100e3, 200e3),
     ]
     solver = Solver(models, schema)
     solver.solve()
-    for model in models:
-        print(model)
     plotter = Plotter(models, solver.inlet_head)
     plot = plotter.plot()
+    for model in models:
+        print(model)
     plt.show()
     
 
@@ -79,7 +77,7 @@ def get_pump_station(interpolator: Interpolator, coordinate: float):
         outlet_coordinate=coordinate,
         a=273.0074080570295,
         b=1.2519107926468433e-06,
-        pump_number=3,
+        pump_number=2,
         min_inlet_head=40,
         preset_outlet_temperature=310,
     )
