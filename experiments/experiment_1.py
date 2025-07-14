@@ -10,6 +10,8 @@ from src.solver import Solver
 
 def main():
     interpolator = get_interpolator()
+
+    # Настройки солвера
     schema = SolverSchema(
         upper_border=20,
         lower_border=0,
@@ -18,10 +20,11 @@ def main():
         inlet_temperature=310,
     )
 
+    # Объекты схемы
     models = [
-        get_pump_station(interpolator, 0, 2),
+        get_pump_station(interpolator, 0, 2), # Насосная станция (можно задать температуру подогрева или охлаждения через preset_outlet_temperature)
         get_pipeline(interpolator, 0, 80e3),
-        get_hookup(interpolator, 80e3, 0.5),
+        get_hookup(interpolator, 80e3, 0.5), # Подкачка
         get_pipeline(interpolator, 80e3, 100e3),
         get_pump_station(interpolator, 100e3, 2),
         get_pipeline(interpolator, 100e3, 200e3),
@@ -36,6 +39,7 @@ def main():
 
 
 def get_interpolator():
+    # Профиль трассы
     points = np.array([(0, 100),
                        (20e3, 90),
                        (50e3, 100),
